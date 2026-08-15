@@ -6,9 +6,9 @@ Roadmap mapping: `P-048 Broken-Link Scanner Action`, with architectural reuse by
 
 ## Decision: adopt instead of rebuild
 
-The public roadmap requires search-before-build. Broken-link scanning already has a mature open-source implementation in Lychee and a maintained GitHub Action. This repository therefore adopts that engine instead of creating a weaker bespoke HTTP crawler.
+The public roadmap requires search-before-build. Broken-link scanning already has a mature open-source implementation in [Lychee](https://github.com/lycheeverse/lychee) and a maintained [Lychee GitHub Action](https://github.com/lycheeverse/lychee-action). This repository therefore adopts that engine instead of creating a weaker bespoke HTTP crawler.
 
-The integration uses Lychee Action **v2.9.0** pinned to commit:
+The integration uses [Lychee Action v2.9.0](https://github.com/lycheeverse/lychee-action/releases/tag/v2.9.0) pinned to commit:
 
 ```text
 e7477775783ea5526144ba13e8db5eec57747ce8
