@@ -22,5 +22,19 @@ jobs:
       - name: Install pytest
         run: python -m pip install --disable-pip-version-check 'pytest>=8,<9'
 
+      - name: Compile Python tools and tests
+        run: python -m compileall -q tools tests
+
       - name: Run repository contract tests
         run: python -m pytest -q
+
+      - name: Run Repo Doctor against this repository
+        run: python tools/repo_doctor.py --json > /tmp/repo-doctor.json
+
+      - name: Verify public reference artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in README.md START-HERE.md docs/REPO-DOCTOR.md exercises/01-first-branch.md tools/repo_doctor.py; do
+            test -s "$f" || { echo "Missing required artifact: $f" >&2; exit 1; }
+          done
