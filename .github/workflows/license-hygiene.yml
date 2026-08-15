@@ -17,8 +17,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pinned Licensee release
-        run: gem install licensee -v 10.1.0 --no-document
+      - name: Install pinned Licensee release without system mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          GEM_HOME="$RUNNER_TEMP/licensee-gems"
+          mkdir -p "$GEM_HOME"
+          echo "GEM_HOME=$GEM_HOME" >> "$GITHUB_ENV"
+          echo "$GEM_HOME/bin" >> "$GITHUB_PATH"
+          gem install --install-dir "$GEM_HOME" licensee -v 10.1.0 --no-document
 
       - name: Detect project license without enforcing a legal/policy choice
         id: detect
