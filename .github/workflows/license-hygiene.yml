@@ -1,0 +1,48 @@
+name: License hygiene
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  licensee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pinned Licensee release
+        run: gem install licensee -v 10.1.0 --no-document
+
+      - name: Detect project license without enforcing a legal/policy choice
+        id: detect
+        shell: bash
+        run: |
+          set +e
+          licensee detect . --json > /tmp/licensee.json
+          rc=$?
+          set -e
+          echo "detector_exit_code=$rc" >> "$GITHUB_OUTPUT"
+          test -s /tmp/licensee.json
+
+      - name: Produce bounded public summary
+        run: |
+          python tools/licensee_summary.py \
+            --input /tmp/licensee.json \
+            --detector-exit-code '${{ steps.detect.outputs.detector_exit_code }}' \
+            > /tmp/license-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('/tmp/license-summary.json').read_text())
+          assert data['evidence_semantics']['legal_advice'] is False
+          assert data['privacy']['absolute_paths_returned'] is False
+          print('LICENSE_DETECTED=', data['detected'])
+          print('LICENSE_IDS=', ','.join(data['license_ids']) or 'NONE')
+          PY
